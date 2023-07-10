@@ -100,6 +100,9 @@ class LODMaker(bpy.types.Operator):
         bpy.context.object.modifiers["Decimate"].ratio = lod1_ratio
         bpy.ops.object.modifier_apply(modifier="Decimate")
         bpy.ops.object.shade_smooth(use_auto_smooth=True)
+        
+        progress = 0.33
+        bpy.context.window_manager.progress_update(progress)
 
         # Copy and paste LOD1 object for LOD2
         bpy.context.view_layer.objects.active = copied_obj
@@ -115,6 +118,10 @@ class LODMaker(bpy.types.Operator):
         bpy.context.object.modifiers["Decimate"].ratio = 1 - (lod2_points / original_points)
         bpy.ops.object.modifier_apply(modifier="Decimate")
         bpy.ops.object.shade_smooth(use_auto_smooth=True)
+        
+        progress = 0.66
+        bpy.context.window_manager.progress_update(progress)
+
 
         # Copy and paste LOD2 object for LOD3
         bpy.context.view_layer.objects.active = copied_obj2
@@ -130,6 +137,9 @@ class LODMaker(bpy.types.Operator):
         bpy.context.object.modifiers["Decimate"].ratio = 1 - (lod3_points / original_points)
         bpy.ops.object.modifier_apply(modifier="Decimate")
         bpy.ops.object.shade_smooth(use_auto_smooth=True)
+        
+        progress = 1.0
+        bpy.context.window_manager.progress_update(progress)
 
         # Check face count of each LOD and perform necessary actions
         lods = [copied_obj, copied_obj2, copied_obj3]
@@ -154,6 +164,8 @@ class LODMaker(bpy.types.Operator):
             
         
             self.report({'INFO'}, "LOD creation successful")
+            
+        bpy.context.window_manager.progress_end()
 
 
         return {'FINISHED'}
@@ -175,7 +187,7 @@ class CreateLODPanel(bpy.types.Panel):
 
         # Create LOD button
         box = layout.box()
-        box.operator("mesh.lod_operator", text="Create LOD")
+        box.operator("mesh.lod_operator", text="Create LOD", icon="SCRIPTPLUGINS")
 
         # LOD ratio inputs
         box = layout.box()
@@ -184,7 +196,7 @@ class CreateLODPanel(bpy.types.Panel):
         box.prop(context.scene, "lod3_ratio", text="LOD3 Ratio", slider=False)
         
         box = layout.box()
-        box.operator("mesh.revert_lod_operator", text="Revert Mesh")
+        box.operator("mesh.revert_lod_operator", text="Revert Mesh", icon="RECOVER_LAST")
 
 class ShowLODPanel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
@@ -199,13 +211,13 @@ class ShowLODPanel(bpy.types.Panel):
 
         # Show LOD buttons
         row = box.row()
-        row.operator("mesh.show_lod0_operator", text="LOD0")
-        row.operator("mesh.show_lod1_operator", text="LOD1")
+        row.operator("mesh.show_lod0_operator", text="LOD0", icon="RESTRICT_VIEW_OFF")
+        row.operator("mesh.show_lod1_operator", text="LOD1", icon="RESTRICT_VIEW_OFF")
 
 
         row = box.row()
-        row.operator("mesh.show_lod2_operator", text="LOD2")
-        row.operator("mesh.show_lod3_operator", text="LOD3")
+        row.operator("mesh.show_lod2_operator", text="LOD2", icon="RESTRICT_VIEW_OFF")
+        row.operator("mesh.show_lod3_operator", text="LOD3", icon="RESTRICT_VIEW_OFF")
 
         
 class SurveyPanel(bpy.types.Panel):
